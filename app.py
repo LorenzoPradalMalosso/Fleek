@@ -6,7 +6,12 @@ import dns.resolver
 import os
 
 # --- Configuração ---
-app = Flask(__name__, template_folder='.', static_folder='.', static_url_path='')
+app = Flask(
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    static_url_path="/static"
+)
 app.secret_key = "segredo_top"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -119,3 +124,4 @@ def logout():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
