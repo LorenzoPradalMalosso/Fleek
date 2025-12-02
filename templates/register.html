@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/style.css">
+    <title>Criar Conta</title>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <h1 class="logo">Criar Conta</h1>
+
+        <!-- 🔥 MENSAGENS DO FLASK -->
+        {% with mensagens = get_flashed_messages(with_categories=True) %}
+        {% if mensagens %}
+        {% for categoria, msg in mensagens %}
+        {% if categoria == "success" %}
+        <div class="success">{{ msg }}</div>
+        {% else %}
+        <div class="error">{{ msg }}</div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- 🔥 ERRO INDIVIDUAL -->
+        {% if erro %}
+        <div class="error">{{ erro }}</div>
+        {% endif %}
+
+        <form action="/register" method="POST">
+            <label>Email</label>
+            <input type="email" name="email" required placeholder="Digite um email válido">
+
+            <label>Senha</label>
+            <input type="password" name="password" required placeholder="Crie uma senha">
+
+            <button class="btn primary" type="submit">Cadastrar</button>
+        </form>
+
+        <p class="register-text">
+            Já tem login? <a href="/">Entrar</a>
+        </p>
+    </div>
+
+</body>
+
+</html>

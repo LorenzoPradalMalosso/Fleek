@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FLEEK - Buscar</title>
+
+    <style>
+        /* ==========================================================
+           1. ESTILOS GERAIS (Mantendo a base)
+           ========================================================== */
+        :root {
+            --bg-color: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            --text-color: #ffffff;
+            --text-muted: #b3b3b3;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-hover: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --blur-amount: 20px;
+            --accent-color: #e0e0e0;
+            --header-bg: rgba(10, 10, 10, 0.7);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root.light-mode {
+            --bg-color: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --text-color: #1a1a1a;
+            --text-muted: #555;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-hover: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(0, 0, 0, 0.05);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --input-bg: rgba(255, 255, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            padding-top: 90px;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        /* --- HEADER --- */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4vw;
+            height: 80px;
+            background: var(--header-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border-bottom: 1px solid var(--card-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: background 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* LOGO COM GLOW CORRIGIDO (Igual Home) */
+        .logo img {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+            z-index: 1;
+            filter: drop-shadow(0 0 12px var(--accent-color)) drop-shadow(0 0 35px var(--accent-color));
+            transition: filter 0.3s ease;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--text-color);
+        }
+
+        .menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover,
+        .icon-btn.active {
+            background: var(--card-hover);
+            color: var(--text-color);
+            transform: scale(1.05);
+        }
+
+        .icon-svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2px;
+        }
+
+        #btn-search-nav .icon-svg {
+            stroke: var(--accent-color);
+        }
+
+        /* --- CONTEÚDO --- */
+        .content {
+            padding: 20px 4vw;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+
+        /* BARRA DE BUSCA (Glass Effect) */
+        .search-bar-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 10px auto 30px auto;
+        }
+
+        .main-search-input {
+            width: 100%;
+            padding: 18px 25px 18px 60px;
+            border-radius: 50px;
+            border: 1px solid var(--card-border);
+            background-color: var(--input-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            font-size: 1.2rem;
+            color: var(--text-color);
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-search-input:focus {
+            border-color: var(--accent-color);
+            background-color: rgba(255, 255, 255, 0.1);
+            /* Sombra dinâmica usando a cor do tema */
+            box-shadow: 0 0 20px var(--accent-color);
+        }
+
+        /* CORREÇÃO AQUI: Placeholder no Modo Escuro */
+        .main-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* CORREÇÃO AQUI: Placeholder no Modo Claro */
+        :root.light-mode .main-search-input::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+
+        .search-icon-svg {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-muted);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* --- SEÇÕES --- */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--accent-color);
+            border-radius: 2px;
+            display: block;
+            box-shadow: 0 0 8px var(--accent-color);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--card-hover);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        /* ==========================================================
+           NOVOS CARDS DE GÊNERO (DESIGN PREMIUM GLASS)
+           ========================================================== */
+        .genre-card {
+            position: relative;
+            border-radius: 16px;
+            aspect-ratio: 1.8/1;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            padding: 20px;
+
+            /* EFEITO GLASS APLICADO AQUI */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* Gradientes Específicos para cada Gênero (Semi-transparentes para o Glass) */
+        /* Usando rgba para transparência */
+        .genre-pop {
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.7), rgba(121, 40, 202, 0.7));
+        }
+
+        .genre-rock {
+            background: linear-gradient(135deg, rgba(224, 32, 32, 0.7), rgba(250, 100, 0, 0.7));
+        }
+
+        .genre-sertanejo {
+            background: linear-gradient(135deg, rgba(0, 176, 155, 0.7), rgba(150, 201, 61, 0.7));
+        }
+
+        .genre-funk {
+            background: linear-gradient(135deg, rgba(142, 45, 226, 0.7), rgba(74, 0, 224, 0.7));
+        }
+
+        .genre-hiphop {
+            background: linear-gradient(135deg, rgba(241, 39, 17, 0.7), rgba(245, 175, 25, 0.7));
+        }
+
+        .genre-eletronica {
+            background: linear-gradient(135deg, rgba(0, 198, 255, 0.7), rgba(0, 114, 255, 0.7));
+        }
+
+        .genre-pagode {
+            background: linear-gradient(135deg, rgba(248, 87, 166, 0.7), rgba(255, 88, 88, 0.7));
+        }
+
+        .genre-indie {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.7), rgba(56, 239, 125, 0.7));
+        }
+
+        /* Hover Effect */
+        .genre-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Título do Gênero */
+        .genre-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Ícone de Fundo Gigante (Decoração) */
+        .genre-icon-bg {
+            position: absolute;
+            bottom: -10px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            transform: rotate(25deg);
+            opacity: 0.6;
+            /* Um pouco mais transparente para o glass */
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+
+        /* Animação do ícone no hover */
+        .genre-card:hover .genre-icon-bg {
+            transform: rotate(15deg) scale(1.1) translate(-5px, -5px);
+            opacity: 0.8;
+        }
+
+        .genre-icon-bg svg {
+            width: 100%;
+            height: 100%;
+            fill: #fff;
+        }
+
+        /* CARDS DE RESULTADO */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            width: 100%;
+            padding: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            background: var(--card-hover);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .card .img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .img {
+            transform: scale(1.08);
+        }
+
+        /* PLAYER STYLES */
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover .play-overlay,
+        .card.playing .play-overlay {
+            opacity: 1;
+        }
+
+        .play-btn-small {
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transform: translateY(10px);
+            transition: transform 0.3s ease;
+            width: 45px;
+            height: 45px;
+        }
+
+        .card:hover .play-btn-small,
+        .card.playing .play-btn-small {
+            transform: translateY(0);
+        }
+
+        .play-btn-small svg {
+            fill: #ffffff;
+            width: 20px;
+            height: 20px;
+            margin-left: 3px;
+        }
+
+        .card.playing .play-btn-small svg.icon-play {
+            display: none;
+        }
+
+        .card.playing .play-btn-small svg.icon-pause {
+            display: block !important;
+            margin-left: 0;
+        }
+
+        .card.loading .play-btn-small svg {
+            display: none;
+        }
+
+        .card.loading .play-btn-small::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            display: block;
+        }
+
+        .card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 1;
+            position: relative;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* CARDS DE ARTISTA */
+        .artist-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .artist-img-container {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+
+        .artist-circle:hover .artist-img-container {
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .artist-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s ease;
+        }
+
+        .artist-circle:hover .artist-img {
+            transform: scale(1.1);
+        }
+
+        .artist-circle p {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-top: 5px;
+        }
+
+        .artist-circle:hover p {
+            color: var(--accent-color);
+        }
+
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            display: block;
+            margin: 60px auto;
+            animation: spin 1s linear infinite;
+        }
+
+        .light-mode .loader {
+            border-color: rgba(0, 0, 0, 0.1);
+            border-top-color: var(--accent-color);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* POPOVER DE TEMAS */
+        .theme-popover {
+            position: fixed;
+            top: 90px;
+            right: 4vw;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(30px);
+            border-radius: 16px;
+            padding: 24px;
+            width: 320px;
+            z-index: 2000;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.98);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .theme-popover.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .popover-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .popover-header h3 {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .light-mode .theme-toggle {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.2);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 26px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="topbar">
+        <a href="index.html" class="logo">
+            <img src="logopng.png" alt="Fleek Logo">
+            <h1>FLEEK</h1>
+        </a>
+
+        <nav class="menu">
+            <a href="index.html" class="icon-btn" aria-label="Home">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+            <button class="icon-btn active" id="btn-search-nav" aria-label="Pesquisar">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+            <button class="icon-btn" id="btn-theme" aria-label="Tema">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+            <a href="conta.html" class="icon-btn" aria-label="Perfil">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M4 21v-2a4 4 0 0 1 3-3.87"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </a>
+        </nav>
+    </header>
+
+    <!-- POPOVER DE TEMA -->
+    <div class="theme-popover" id="theme-popover">
+        <div class="popover-header">
+            <h3>Aparência</h3><button class="close-btn" id="close-popover">&times;</button>
+        </div>
+        <div class="theme-toggle"><span style="color: var(--text-muted); font-size: 0.9rem;">Modo Claro</span><label
+                class="switch"><input type="checkbox" id="light-dark-toggle"><span class="slider"></span></label></div>
+        <div style="margin-top: 15px;">
+            <h4
+                style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
+                Cor de Destaque</h4>
+            <div class="color-palette">
+                <div class="color-swatch" data-color="#B0B0B0" style="background: #B0B0B0; border: 1px solid #888;"
+                    title="Padrão (Prata)"></div>
+                <div class="color-swatch" data-color="#9f55ff" style="background: #9f55ff;"></div>
+                <div class="color-swatch" data-color="#2563eb" style="background: #2563eb;"></div>
+                <div class="color-swatch" data-color="#10b981" style="background: #10b981;"></div>
+                <div class="color-swatch" data-color="#f59e0b" style="background: #f59e0b;"></div>
+                <div class="color-swatch" data-color="#ef4444" style="background: #ef4444;"></div>
+                <div class="color-swatch" data-color="#1a1a1a" style="background: #1a1a1a; border: 1px solid #555;"
+                    title="Escuro"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="content">
+
+        <div class="search-bar-container">
+            <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="main-search-input" class="main-search-input"
+                placeholder="Busque artistas, músicas ou gêneros..." autofocus>
+        </div>
+
+        <!-- SEÇÃO 1: GÊNEROS COM ÍCONES SVG -->
+        <section id="genre-section">
+            <div class="section-header">
+                <h2>Explorar Gêneros</h2>
+            </div>
+            <div class="results-grid">
+
+                <div class="genre-card genre-pop" onclick="searchGenre('Pop')">
+                    <h3>Pop</h3>
+                    <div class="genre-icon-bg">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 18V5l12-2v13"></path>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <circle cx="18" cy="16" r="3"></circle>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="genre-card genre-rock" onclick="searchGenre('Rock')">
+                    <h3>Rock</h3>
+                    <div class="genre-icon-bg">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="genre-card genre-sertanejo" onclick="searchGenre('Sertanejo')">
+                    <h3>Sertanejo</h3>
+                    <div class="genre-icon-bg">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="genre-card genre-funk" onclick="searchGenre('Funk')">
+                    <h3>Funk</h3>
+                    <div class="genre-icon-bg">
+                        <svg viewBox="0 0 24 24">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="genre-card genre-hiphop" onclick="searchGenre('Hip-Hop')">
+                    <h3>Hip-Hop</h3>
+                    <div class="genre-icon-bg">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="genre-card genre-eletronica" onclick="searchGenre('Electronic')">
+                    <h3>Eletrônica</h3>
+                    <div class="genre-icon-bg">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="genre-card genre-pagode" onclick="searchGenre('Pagode')">
+                    <h3>Pagode</h3>
+                    <div class="genre-icon-bg">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M2 12h20"></path>
+                            <path d="M12 2v20"></path>
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="genre-card genre-indie" onclick="searchGenre('Indie')">
+                    <h3>Indie</h3>
+                    <div class="genre-icon-bg">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2.69l5.74 9.94H6.26L12 2.69zM12 21.31l-5.74-9.94h11.48L12 21.31z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: RESULTADOS DA BUSCA -->
+        <section id="search-results-section" class="hidden">
+            <div class="section-header">
+                <button class="back-btn" onclick="resetToGenres()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Voltar
+                </button>
+                <h2 id="search-results-title">Resultados</h2>
+            </div>
+            <div class="results-grid" id="search-results-grid"></div>
+        </section>
+
+        <!-- SEÇÃO 3: DETALHES DO ARTISTA -->
+        <section id="artist-details-section" class="hidden">
+            <div class="section-header">
+                <button class="back-btn" id="back-to-results-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Voltar aos resultados
+                </button>
+                <h2 id="artist-name-title">Músicas Populares</h2>
+            </div>
+            <div class="results-grid" id="artist-tracks-grid"></div>
+        </section>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // PLAYER DE ÁUDIO HÍBRIDO (iTunes Fallback)
+        // ==========================================
+        let currentAudio = null;
+        let currentPlayBtn = null;
+
+        async function getItunesPreview(songName, artistName) {
+            try {
+                const query = `${songName} ${artistName}`;
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=1`);
+                const data = await res.json();
+                if (data.results && data.results.length > 0) return data.results[0].previewUrl;
+                return null;
+            } catch (e) { console.error("Erro iTunes:", e); return null; }
+        }
+
+        async function playTrack(btn, spotifyPreviewUrl, songName, artistName, spotifyLink) {
+            if (currentPlayBtn === btn && currentAudio) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    btn.closest('.card').classList.add('playing');
+                } else {
+                    currentAudio.pause();
+                    btn.closest('.card').classList.remove('playing');
+                }
+                return;
+            }
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentPlayBtn) currentPlayBtn.closest('.card').classList.remove('playing');
+            }
+
+            let audioUrl = spotifyPreviewUrl;
+            if (!audioUrl || audioUrl === 'null' || audioUrl === 'undefined') {
+                btn.closest('.card').classList.add('loading');
+                audioUrl = await getItunesPreview(songName, artistName);
+                btn.closest('.card').classList.remove('loading');
+            }
+
+            if (audioUrl) {
+                currentAudio = new Audio(audioUrl);
+                currentPlayBtn = btn;
+                currentAudio.play()
+                    .then(() => btn.closest('.card').classList.add('playing'))
+                    .catch(e => alert("Erro de áudio."));
+                currentAudio.onended = () => {
+                    btn.closest('.card').classList.remove('playing');
+                    currentAudio = null;
+                };
+            } else {
+                if (spotifyLink) window.open(spotifyLink, '_blank');
+                else alert("Música indisponível.");
+            }
+        }
+
+        // ==========================================
+        // CONFIGURAÇÃO E API (SPOTIFY)
+        // ==========================================
+        const clientId = 'acfec55c6b6448c5b8521549f9f1e8dc';
+        const clientSecret = '0ebed43e9c404666ad620e84a6813cb6';
+        let spotifyToken = null;
+        let searchTimer;
+
+        async function getSpotifyToken() {
+            if (spotifyToken) return spotifyToken;
+            try {
+                const res = await fetch('https://accounts.spotify.com/api/token', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret), 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'grant_type=client_credentials'
+                });
+                if (!res.ok) throw new Error('Auth Failed');
+                const data = await res.json();
+                spotifyToken = data.access_token;
+                return spotifyToken;
+            } catch (e) { console.error("Token Error:", e); return null; }
+        }
+
+        async function searchSpotify(query) {
+            if (!query) return [];
+            const token = await getSpotifyToken();
+            if (!token) return [];
+
+            try {
+                const isGenreSearch = query.includes('genre:');
+                const types = isGenreSearch ? 'track' : 'track,album,artist';
+                const limit = isGenreSearch ? 30 : 15;
+                const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${types}&market=BR&limit=${limit}`;
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (isGenreSearch) return data.tracks?.items || [];
+                return [...(data.artists?.items || []), ...(data.tracks?.items || []), ...(data.albums?.items || [])];
+            } catch (e) { return []; }
+        }
+
+        async function getArtistTopTracks(artistId) {
+            const token = await getSpotifyToken();
+            try {
+                const url = `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=BR`;
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                return data.tracks;
+            } catch (e) { console.error(e); return []; }
+        }
+
+        // --- INTERFACE ---
+
+        function searchGenre(genreName) {
+            const input = document.getElementById('main-search-input');
+            input.value = genreName;
+            performSearch(`genre:"${genreName}"`, `Músicas: ${genreName}`);
+        }
+
+        async function openArtistDetails(artistId, artistName) {
+            document.getElementById('artist-tracks-grid').innerHTML = '<div class="loader"></div>';
+            document.getElementById('search-results-section').classList.add('hidden');
+            document.getElementById('genre-section').classList.add('hidden');
+            document.getElementById('artist-details-section').classList.remove('hidden');
+
+            document.getElementById('artist-name-title').innerText = `Top Músicas: ${artistName}`;
+            const tracks = await getArtistTopTracks(artistId);
+            renderResults(tracks, 'artist-tracks-grid');
+
+            document.getElementById('back-to-results-btn').onclick = () => {
+                document.getElementById('artist-details-section').classList.add('hidden');
+                document.getElementById('search-results-section').classList.remove('hidden');
+            };
+        }
+
+        function renderResults(results, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            if (results.length === 0) { container.innerHTML = '<p style="color: var(--text-muted);">Nada encontrado.</p>'; return; }
+
+            results.forEach(item => {
+                const div = document.createElement('div');
+                const images = item.images || (item.album ? item.album.images : []);
+                const imgUrl = (images && images.length > 0) ? images[0].url : 'https://placehold.co/300x300/333/ccc?text=No+Img';
+                let title = item.name;
+
+                if (item.type === 'artist') {
+                    div.className = 'artist-circle';
+                    div.onclick = () => openArtistDetails(item.id, item.name);
+                    div.innerHTML = `<div class="artist-img-container"><div class="artist-img" style="background-image: url('${imgUrl}')"></div></div><p>${title}</p>`;
+                } else {
+                    // CARD COM PLAYER
+                    div.className = 'card';
+                    const artist = item.artists ? item.artists[0].name : item.name;
+                    const previewUrl = item.preview_url;
+                    const spotifyLink = item.external_urls ? item.external_urls.spotify : '';
+                    const safeTitle = title.replace(/'/g, "&apos;");
+                    const safeArtist = artist.replace(/'/g, "&apos;");
+
+                    div.innerHTML = `
+                        <div class="card-img-wrapper">
+                            <div class="img" style="background-image: url('${imgUrl}')"></div>
+                            <div class="play-overlay">
+                                <div class="play-btn-small" onclick="playTrack(this, '${previewUrl}', '${safeTitle}', '${safeArtist}', '${spotifyLink}')">
+                                    <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    <svg class="icon-pause" style="display:none;" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>${title}</h4><p>${artist}</p>
+                    `;
+                }
+                container.appendChild(div);
+            });
+        }
+
+        async function performSearch(apiQuery, displayLabel) {
+            const genreSection = document.getElementById('genre-section');
+            const resultsSection = document.getElementById('search-results-section');
+            const artistSection = document.getElementById('artist-details-section');
+            const grid = document.getElementById('search-results-grid');
+
+            genreSection.classList.add('hidden');
+            artistSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+            grid.innerHTML = '<div class="loader"></div>';
+            document.getElementById('search-results-title').innerText = displayLabel || `Resultados para "${apiQuery}"`;
+
+            const results = await searchSpotify(apiQuery);
+            renderResults(results, 'search-results-grid');
+        }
+
+        function resetToGenres() {
+            document.getElementById('main-search-input').value = '';
+            document.getElementById('search-results-section').classList.add('hidden');
+            document.getElementById('artist-details-section').classList.add('hidden');
+            document.getElementById('genre-section').classList.remove('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Tema
+            const root = document.documentElement;
+            const themeBtn = document.getElementById('btn-theme');
+            const popover = document.getElementById('theme-popover');
+            const closePop = document.getElementById('close-popover');
+
+            themeBtn.addEventListener('click', () => popover.classList.toggle('active'));
+            closePop.addEventListener('click', () => popover.classList.remove('active'));
+
+            document.getElementById('light-dark-toggle').addEventListener('change', (e) => {
+                root.classList.toggle('light-mode');
+                localStorage.setItem('fleek-theme', root.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+            document.querySelectorAll('.color-swatch').forEach(s => {
+                s.addEventListener('click', () => {
+                    root.style.setProperty('--accent-color', s.dataset.color);
+                    localStorage.setItem('fleek-accent-v2', s.dataset.color);
+                });
+            });
+
+            if (localStorage.getItem('fleek-theme') === 'light') {
+                root.classList.add('light-mode');
+                document.getElementById('light-dark-toggle').checked = true;
+            }
+            const savedAccent = localStorage.getItem('fleek-accent-v2');
+            if (!savedAccent || savedAccent === '#9f55ff') {
+                root.style.setProperty('--accent-color', '#B0B0B0'); // Prata padrão
+            } else {
+                root.style.setProperty('--accent-color', savedAccent);
+            }
+
+            await getSpotifyToken();
+
+            const searchInput = document.getElementById('main-search-input');
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimer);
+                const query = searchInput.value.trim();
+                if (query === "") { resetToGenres(); return; }
+                searchTimer = setTimeout(() => { performSearch(query); }, 500);
+            });
+        });
+    </script>
+</body>
+
+</html>
