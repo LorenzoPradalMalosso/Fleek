@@ -3,7 +3,9 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 import dns.resolver
-import os
+import osc
+print("Templates path:", os.listdir("templates"))
+
 
 # --- Configuração ---
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -107,15 +109,14 @@ def register_user():
 def home():
     if "user" in session:
         # Certifique-se que o arquivo na sua pasta é index.html
-        return render_template("index.html") 
+        return render_template("index.html")
     
     # Se tentar acessar /home direto sem logar, joga pro login
     return redirect("/")
 
 @app.route("/conta")
 def conta():
-    if "user" not in session:
-        return redirect("/")
+    print("Templates path:", os.listdir("templates"))
     return render_template("conta.html")
 
 @app.route("/logout")
@@ -126,3 +127,4 @@ def logout():
 if __name__ == "__main__":
 
     app.run(debug=True)
+
