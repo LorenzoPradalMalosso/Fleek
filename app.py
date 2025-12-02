@@ -112,10 +112,17 @@ def home():
     # Se tentar acessar /home direto sem logar, joga pro login
     return redirect("/")
 
+@app.route("/conta")
+def conta():
+    if "user" not in session:
+        return redirect("/")
+    return render_template("conta.html")
+
 @app.route("/logout")
 def logout():
     session.pop("user", None)
     return redirect("/")
 
 if __name__ == "__main__":
+
     app.run(debug=True)
