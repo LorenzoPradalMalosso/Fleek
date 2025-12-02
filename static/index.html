@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FLEEK - A Música Move Você</title>
+
+    <style>
+        /* =========================================
+           1. VARIÁVEIS E RESET
+           ========================================= */
+        :root {
+            /* --- MODO ESCURO (PADRÃO) --- */
+            --bg-color: linear-gradient(135deg, #121212 0%, #0a0a0a 100%);
+            --text-color: #ffffff;
+            --text-muted: #b3b3b3;
+
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-hover: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --card-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+
+            --header-bg: rgba(10, 10, 10, 0.7);
+
+            --blur-amount: 20px;
+            --accent-color: #B0B0B0;
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root.light-mode {
+            /* --- MODO CLARO (CORRIGIDO) --- */
+            --bg-color: linear-gradient(135deg, #f0f2f5 0%, #e6e9f0 100%);
+
+            --text-color: #1a1a1a;
+            --text-muted: #555;
+
+            /* Cards: Mais sólidos para não sumirem */
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-hover: rgba(255, 255, 255, 0.95);
+            --card-border: rgba(255, 255, 255, 0.8);
+            /* Borda branca definida */
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            /* Sombra suave para destacar do fundo */
+
+            --header-bg: rgba(255, 255, 255, 0.75);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.5s ease, color 0.5s ease;
+            min-height: 100vh;
+            padding-top: 90px;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar Customizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .light-mode ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =========================================
+           2. HEADER (TOPBAR)
+           ========================================= */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4vw;
+            height: 80px;
+            background: var(--header-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border-bottom: 1px solid var(--card-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .logo img {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+            z-index: 1;
+            filter: drop-shadow(0 0 12px var(--accent-color)) drop-shadow(0 0 35px var(--accent-color));
+            transition: filter 0.3s ease;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--text-color);
+        }
+
+        /* MENU DE ÍCONES */
+        .menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--card-hover);
+            color: var(--text-color);
+            transform: scale(1.05);
+        }
+
+        .icon-svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2px;
+        }
+
+        /* =========================================
+           3. CONTEÚDO E CARDS
+           ========================================= */
+        .content {
+            padding: 20px 4vw;
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            padding-bottom: 100px;
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--accent-color);
+            border-radius: 2px;
+            display: block;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Scroll Horizontal */
+        .scroll {
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            padding: 10px 5px 30px 5px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        /* --- CARD DE MÚSICA/ÁLBUM (VISÍVEL NO LIGHT MODE) --- */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+
+            border-radius: 12px;
+            width: 200px;
+            flex-shrink: 0;
+            padding: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            background: var(--card-hover);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        /* Glow Sutil no Hover (Apenas visual) */
+        .card:hover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--accent-color), transparent 70%);
+            opacity: 0.1;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .card-img-wrapper {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .card .img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .img {
+            transform: scale(1.08);
+        }
+
+        /* BOTÃO PLAY */
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover .play-overlay,
+        .card.playing .play-overlay {
+            opacity: 1;
+        }
+
+        .play-btn-small {
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transform: translateY(10px);
+            transition: transform 0.3s ease;
+            width: 45px;
+            height: 45px;
+        }
+
+        .card:hover .play-btn-small,
+        .card.playing .play-btn-small {
+            transform: translateY(0);
+        }
+
+        .play-btn-small svg {
+            fill: #ffffff;
+            width: 20px;
+            height: 20px;
+            margin-left: 3px;
+        }
+
+        .card.playing .play-btn-small svg.icon-play {
+            display: none;
+        }
+
+        .card.playing .play-btn-small svg.icon-pause {
+            display: block !important;
+            margin-left: 0;
+        }
+
+        .card.loading .play-btn-small svg {
+            display: none;
+        }
+
+        .card.loading .play-btn-small::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            display: block;
+        }
+
+        /* TEXTO DO CARD (SEM GRADIENTE, SÓLIDO) */
+        .card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 1;
+            position: relative;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* --- CARD DE ARTISTA --- */
+        .artist-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 160px;
+            flex-shrink: 0;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .artist-img-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border: 3px solid transparent;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+            background: var(--card-bg);
+        }
+
+        .artist-circle:hover .artist-img-container {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-color);
+        }
+
+        .artist-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .artist-circle:hover .artist-img {
+            transform: scale(1.1);
+        }
+
+        .artist-circle p {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .artist-circle:hover p {
+            color: var(--accent-color);
+        }
+
+        /* --- SEÇÕES DE DETALHES (Nova Navegação) --- */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--card-hover);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .section-header-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .section-header-details h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+
+        /* =========================================
+           4. EXTRAS
+           ========================================= */
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        .light-mode .loader {
+            border-color: rgba(0, 0, 0, 0.1);
+            border-top-color: var(--accent-color);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* POPOVER DE TEMAS */
+        .theme-popover {
+            position: fixed;
+            top: 90px;
+            right: 4vw;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(30px);
+            border-radius: 16px;
+            padding: 24px;
+            width: 320px;
+            z-index: 2000;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.98);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .light-mode .theme-popover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-popover.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .popover-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .popover-header h3 {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .light-mode .theme-toggle {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.2);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 26px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="topbar">
+        <a href="sobrenos.html" class="logo">
+            <img src="logopng.png" alt="Fleek Logo">
+            <h1>FLEEK</h1>
+        </a>
+
+        <!-- MENU (APENAS 3 ÍCONES + PERFIL) -->
+        <nav class="menu">
+            <!-- Ícone de Busca (Link para busca.html) -->
+            <a href="busca.html" class="icon-btn" aria-label="Buscar">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </a>
+
+            <!-- Ícone de Tema -->
+            <button class="icon-btn" id="btn-theme" aria-label="Tema">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+
+            <!-- Ícone de Perfil -->
+            <a href="conta.html" class="icon-btn" aria-label="Perfil">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M4 21v-2a4 4 0 0 1 3-3.87"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </a>
+        </nav>
+    </header>
+
+    <!-- POPOVER DE TEMA -->
+    <div class="theme-popover" id="theme-popover">
+        <div class="popover-header">
+            <h3>Aparência</h3>
+            <button class="close-btn" id="close-popover">&times;</button>
+        </div>
+        <div class="theme-toggle">
+            <span style="color: var(--text-muted); font-size: 0.9rem;">Modo Claro</span>
+            <label class="switch"><input type="checkbox" id="light-dark-toggle"><span class="slider"></span></label>
+        </div>
+        <div style="margin-top: 15px;">
+            <h4
+                style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
+                Cor de Destaque</h4>
+            <div class="color-palette">
+                <div class="color-swatch" data-color="#B0B0B0" style="background: #B0B0B0; border: 1px solid #888;"
+                    title="Padrão (Prata)"></div>
+                <div class="color-swatch" data-color="#9f55ff" style="background: #9f55ff;"></div>
+                <div class="color-swatch" data-color="#2563eb" style="background: #2563eb;"></div>
+                <div class="color-swatch" data-color="#10b981" style="background: #10b981;"></div>
+                <div class="color-swatch" data-color="#f59e0b" style="background: #f59e0b;"></div>
+                <div class="color-swatch" data-color="#ef4444" style="background: #ef4444;"></div>
+                <div class="color-swatch" data-color="#1a1a1a" style="background: #1a1a1a; border: 1px solid #555;"
+                    title="Escuro"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+
+        <!-- NOVO: SEÇÃO DE DETALHES DO ARTISTA (Oculta por padrão) -->
+        <section id="artist-details-section" class="hidden">
+            <div class="section-header-details">
+                <button class="back-btn" onclick="resetToHome()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    Voltar para Home
+                </button>
+                <h2 id="artist-name-title">Músicas Populares</h2>
+            </div>
+            <div class="results-grid" id="artist-tracks-grid"></div>
+        </section>
+
+        <!-- 1. LANÇAMENTOS DA SEMANA -->
+        <section id="new-releases-section">
+            <h2>Lançamentos da Semana</h2>
+            <div class="scroll" id="recommendations-scroll">
+                <div class="loader"></div>
+            </div>
+        </section>
+
+        <!-- 2. TOP 50 BRASIL -->
+        <section id="top-tracks-section">
+            <h2>Em Alta no Brasil 🇧🇷</h2>
+            <div class="scroll" id="top-tracks-scroll">
+                <div class="loader"></div>
+            </div>
+        </section>
+
+        <!-- 3. ARTISTAS EM DESTAQUE -->
+        <section id="top-artists-section">
+            <h2>Artistas em Destaque</h2>
+            <div class="scroll" id="artists-scroll">
+                <div class="loader"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // PLAYER DE ÁUDIO HÍBRIDO (Spotify + iTunes Fallback)
+        // ==========================================
+        let currentAudio = null;
+        let currentPlayBtn = null;
+
+        async function getItunesPreview(songName, artistName) {
+            try {
+                const query = `${songName} ${artistName}`;
+                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=1`);
+                const data = await res.json();
+                if (data.results && data.results.length > 0) return data.results[0].previewUrl;
+                return null;
+            } catch (e) { console.error("Erro iTunes:", e); return null; }
+        }
+
+        async function playTrack(btn, spotifyPreviewUrl, songName, artistName, spotifyLink) {
+            if (currentPlayBtn === btn && currentAudio) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    btn.closest('.card').classList.add('playing');
+                } else {
+                    currentAudio.pause();
+                    btn.closest('.card').classList.remove('playing');
+                }
+                return;
+            }
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentPlayBtn) currentPlayBtn.closest('.card').classList.remove('playing');
+            }
+
+            let audioUrl = spotifyPreviewUrl;
+            if (!audioUrl || audioUrl === 'null' || audioUrl === 'undefined') {
+                btn.closest('.card').classList.add('loading');
+                audioUrl = await getItunesPreview(songName, artistName);
+                btn.closest('.card').classList.remove('loading');
+            }
+
+            if (audioUrl) {
+                currentAudio = new Audio(audioUrl);
+                currentPlayBtn = btn;
+                currentAudio.play()
+                    .then(() => btn.closest('.card').classList.add('playing'))
+                    .catch(e => alert("Erro de áudio."));
+                currentAudio.onended = () => {
+                    btn.closest('.card').classList.remove('playing');
+                    currentAudio = null;
+                };
+            } else {
+                if (spotifyLink) window.open(spotifyLink, '_blank');
+                else alert("Música indisponível.");
+            }
+        }
+
+        // ==========================================
+        // CONFIGURAÇÃO E API (SPOTIFY)
+        // ==========================================
+        const clientId = 'acfec55c6b6448c5b8521549f9f1e8dc';
+        const clientSecret = '0ebed43e9c404666ad620e84a6813cb6';
+        let spotifyToken = null;
+
+        async function getSpotifyToken() {
+            if (spotifyToken) return spotifyToken;
+            try {
+                const res = await fetch('https://accounts.spotify.com/api/token', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret), 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'grant_type=client_credentials'
+                });
+                if (!res.ok) throw new Error('Auth Failed');
+                const data = await res.json();
+                spotifyToken = data.access_token;
+                return spotifyToken;
+            } catch (e) { console.error("Token Error:", e); return null; }
+        }
+
+        async function getNewReleases(token) {
+            try {
+                const res = await fetch('https://api.spotify.com/v1/browse/new-releases?country=BR&limit=10', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                return data.albums.items;
+            } catch (e) { return []; }
+        }
+
+        async function getTopTracks(token) {
+            try {
+                const playlistId = '37i9dQZEVXbMXbN3EUUhlg';
+                const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=12`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.items && data.items.length > 0) return data.items.map(item => item.track);
+                }
+                throw new Error("Playlist Vazia");
+            } catch (e) {
+                try {
+                    const searchRes = await fetch(`https://api.spotify.com/v1/search?q=Top%20Brasil&type=track&market=BR&limit=12`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    const searchData = await searchRes.json();
+                    return searchData.tracks.items;
+                } catch (err) { return []; }
+            }
+        }
+
+        async function getTopArtists(token) {
+            try {
+                const tracks = await getTopTracks(token);
+                const artistIds = new Set();
+                tracks.forEach(t => { if (t && t.artists) t.artists.slice(0, 1).forEach(a => artistIds.add(a.id)); });
+                const ids = Array.from(artistIds).slice(0, 10).join(',');
+                if (ids) {
+                    const res = await fetch(`https://api.spotify.com/v1/artists?ids=${ids}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    if (res.ok) { const data = await res.json(); return data.artists; }
+                }
+                throw new Error("Ids Vazios");
+            } catch (e) {
+                try {
+                    const searchRes = await fetch(`https://api.spotify.com/v1/search?q=genre:pop&type=artist&market=BR&limit=10`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    const searchData = await searchRes.json();
+                    return searchData.artists.items;
+                } catch (err) { return []; }
+            }
+        }
+
+        async function getArtistTopTracks(artistId) {
+            const token = await getSpotifyToken();
+            try {
+                const url = `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=BR`;
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                return data.tracks;
+            } catch (e) { console.error(e); return []; }
+        }
+
+
+        // --- FUNÇÕES DE NAVEGAÇÃO DA HOMEPAGE ---
+
+        function toggleMainSections(show) {
+            document.getElementById('new-releases-section').style.display = show ? 'block' : 'none';
+            document.getElementById('top-tracks-section').style.display = show ? 'block' : 'none';
+            document.getElementById('top-artists-section').style.display = show ? 'block' : 'none';
+            document.getElementById('artist-details-section').classList.toggle('hidden', show);
+        }
+
+        function resetToHome() {
+            toggleMainSections(true);
+        }
+
+        window.openArtistDetails = async function (artistId, artistName) {
+            const container = document.getElementById('artist-tracks-grid');
+            container.innerHTML = '<div class="loader"></div>';
+            toggleMainSections(false);
+
+            document.getElementById('artist-name-title').innerText = `Top Músicas: ${artistName}`;
+
+            const tracks = await getArtistTopTracks(artistId);
+            renderList(tracks, 'artist-tracks-grid', 'track');
+        }
+
+        // --- RENDERIZAÇÃO E CRIAÇÃO DE CARDS ---
+
+        function createCard(item, type) {
+            const div = document.createElement('div');
+            let img = 'https://placehold.co/200?text=No+Img';
+            let title = item.name;
+            let sub = '';
+
+            if (type === 'artist' || item.type === 'artist') {
+                if (item.images && item.images.length > 0) img = item.images[0].url;
+                div.className = 'artist-circle';
+                div.onclick = () => window.openArtistDetails(item.id, item.name); // CLICÁVEL
+                div.innerHTML = `<div class="artist-img-container"><div class="artist-img" style="background-image: url('${img}');"></div></div><p>${title}</p>`;
+                return div;
+            }
+
+            div.className = 'card';
+            if (item.album && item.album.images && item.album.images.length > 0) img = item.album.images[0].url;
+            else if (item.images && item.images.length > 0) img = item.images[0].url;
+
+            if (item.artists) sub = item.artists.map(a => a.name).join(', ');
+
+            const previewUrl = item.preview_url;
+            const spotifyLink = item.external_urls ? item.external_urls.spotify : '';
+            const safeTitle = title.replace(/'/g, "&apos;");
+            const safeArtist = sub.replace(/'/g, "&apos;");
+
+            div.innerHTML = `
+                <div class="card-img-wrapper">
+                    <div class="img" style="background-image: url('${img}');"></div>
+                    <div class="play-overlay">
+                        <div class="play-btn-small" onclick="playTrack(this, '${previewUrl}', '${safeTitle}', '${safeArtist}', '${spotifyLink}')">
+                            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg class="icon-pause" style="display:none;" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                        </div>
+                    </div>
+                </div>
+                <h4>${title}</h4><p>${sub}</p>
+            `;
+            return div;
+        }
+
+        function renderList(data, containerId, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            if (!data || data.length === 0) { container.innerHTML = '<p style="color: var(--text-muted); padding:20px;">Indisponível.</p>'; return; }
+            data.forEach(item => container.appendChild(createCard(item, type)));
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Tema
+            const root = document.documentElement;
+            const themeBtn = document.getElementById('btn-theme');
+            const popover = document.getElementById('theme-popover');
+            const closePop = document.getElementById('close-popover');
+
+            themeBtn.addEventListener('click', () => popover.classList.toggle('active'));
+            closePop.addEventListener('click', () => popover.classList.remove('active'));
+
+            document.getElementById('light-dark-toggle').addEventListener('change', (e) => {
+                root.classList.toggle('light-mode');
+                localStorage.setItem('fleek-theme', root.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+            document.querySelectorAll('.color-swatch').forEach(s => {
+                s.addEventListener('click', () => {
+                    root.style.setProperty('--accent-color', s.dataset.color);
+                    localStorage.setItem('fleek-accent-v2', s.dataset.color);
+                });
+            });
+
+            if (localStorage.getItem('fleek-theme') === 'light') {
+                root.classList.add('light-mode');
+                document.getElementById('light-dark-toggle').checked = true;
+            }
+            const savedAccent = localStorage.getItem('fleek-accent-v2');
+            if (!savedAccent || savedAccent === '#9f55ff') {
+                root.style.setProperty('--accent-color', '#B0B0B0');
+            } else {
+                root.style.setProperty('--accent-color', savedAccent);
+            }
+
+            const token = await getSpotifyToken();
+            if (token) {
+                const [releases, tracks, artists] = await Promise.all([
+                    getNewReleases(token),
+                    getTopTracks(token),
+                    getTopArtists(token)
+                ]);
+
+                renderList(releases, 'recommendations-scroll', 'album');
+                renderList(tracks, 'top-tracks-scroll', 'track');
+                renderList(artists, 'artists-scroll', 'artist');
+            }
+        });
+    </script>
+</body>
+
+</html>
